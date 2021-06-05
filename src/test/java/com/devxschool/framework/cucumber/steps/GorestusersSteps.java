@@ -4,6 +4,7 @@ package com.devxschool.framework.cucumber.steps;
 import com.devxschool.framework.api.pojos.User;
 import com.devxschool.framework.api.pojos.UserResponseList;
 import com.devxschool.framework.api.pojos.UserResponseObject;
+import com.devxschool.framework.cucumber.steps.common.CommonData;
 import com.devxschool.framework.utilities.ObjectConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GorestusersSteps {
-    private Response response;
+    private CommonData commonData;
     private int userId;
+
+
+    public GorestusersSteps(CommonData commonData){
+        this.commonData = commonData;
+    }
 
     @Before
     public void setUp(){
@@ -33,17 +39,13 @@ public class GorestusersSteps {
     @When("^all users are requested$")
     public void all_users_are_requested() {
         RequestSpecification rs = getHeadersNoKey();
-        response =rs.get("/users");
+        commonData.response =rs.get("/users");
     }
 
-    @Then("^status code returned is (\\d+)$")
-    public void status_code_returned_is(int expectedStatusCode) {
-        MatcherAssert.assertThat(response.getStatusCode(),Matchers.is(expectedStatusCode));
-    }
 
     @Then("^(\\d+) users are returned$")
     public void users_are_returned(int expectedSize) throws JsonProcessingException {
-            UserResponseList userResponseList = ObjectConverter.convertJsonObjectToJavaObject(response.body().asString(),UserResponseList.class);
+            UserResponseList userResponseList = ObjectConverter.convertJsonObjectToJavaObject(commonData.response.body().asString(),UserResponseList.class);
             MatcherAssert.assertThat(userResponseList.getUserList().size(),Matchers.is(expectedSize));
     }
     @When("^following user is created$")
@@ -51,16 +53,16 @@ public class GorestusersSteps {
         RequestSpecification rs = getHeadersWithKey();
         rs.body(userRequest.get(0));
 
-        response = rs.post("/users");
-        response.prettyPrint();
-        userId = response.getBody().jsonPath().getInt("data.id");
+        commonData.response = rs.post("/users");
+        commonData.response.prettyPrint();
+        userId = commonData.response.getBody().jsonPath().getInt("data.id");
         System.out.println(userId);
     }
 
     @Then("^following user response is returned$")
     public void following_user_response_is_returned( List<User> expectedUserResponse) throws JsonProcessingException {
         UserResponseObject actualUserResponse =
-                ObjectConverter.convertJsonObjectToJavaObject(response.body().asString(),UserResponseObject.class);
+                ObjectConverter.convertJsonObjectToJavaObject(commonData.response.body().asString(),UserResponseObject.class);
 
         MatcherAssert.assertThat(actualUserResponse.getUser().getName(),Matchers.is(expectedUserResponse.get(0).getName()));
         MatcherAssert.assertThat(actualUserResponse.getUser().getStatus(),Matchers.is(expectedUserResponse.get(0).getStatus()));
@@ -73,7 +75,7 @@ public class GorestusersSteps {
     @When("^the user is deleted$")
     public void the_user_is_deleted()  {
         RequestSpecification rs = getHeadersWithKey();
-        response = rs
+        commonData.response = rs
                 .pathParam("id",userId)
                 .delete("/users/{id}");
     }
@@ -82,7 +84,7 @@ public class GorestusersSteps {
     public void the_user_id_is_requested()  {
         RequestSpecification rs=getHeadersNoKey();
 
-        response = rs
+        commonData.response = rs
                 .pathParam("id",userId)
                 .get("/users/{id}");
     }

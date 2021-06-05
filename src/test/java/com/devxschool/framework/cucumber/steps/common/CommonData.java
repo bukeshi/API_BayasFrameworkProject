@@ -1,9 +1,14 @@
 package com.devxschool.framework.cucumber.steps.common;
 
-import javax.xml.ws.Response;
 
+import io.restassured.response.Response;
+
+/*
+*   Container class for the common data between steps
+*
+*/
 public class CommonData {
-    private Response response;
+    public Response response;
 
 
 }

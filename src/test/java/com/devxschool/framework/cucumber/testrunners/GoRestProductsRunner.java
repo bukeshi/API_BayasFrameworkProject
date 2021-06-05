@@ -7,15 +7,15 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = {
-                "src/test/resources/features/gorestusers.feature"
+                "src/test/resources/features/GoRestProducts.feature"
         },
         glue = {
                 "com.devxschool.framework.cucumber.steps"
         },
         tags = {
-                " @GoRest"
+                " @CreateProduct"
         },
         dryRun = false
 )
-public class GorestTest {
+public class GoRestProductsRunner {
 }
